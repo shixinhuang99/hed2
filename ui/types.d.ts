@@ -3,7 +3,6 @@ export interface Group {
   text: string;
   list: Item[];
   system: boolean;
-  textDraft: string;
   enabled: boolean;
 }
 

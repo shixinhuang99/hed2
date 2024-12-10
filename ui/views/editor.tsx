@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { EditorKind } from '~/enum';
+import { EditorKind } from '~/consts';
 import { EditorBody } from './editor-body';
 import { EditorHeader } from './editor-header';
 

@@ -1,4 +1,4 @@
-import { EditorKind } from '~/enum';
+import { EditorKind } from '~/consts';
 import { ListEditor } from './list-editor';
 import { TextEditor } from './text-editor';
 

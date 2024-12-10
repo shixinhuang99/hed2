@@ -33,7 +33,7 @@ const TooltipArrow = React.forwardRef<
   return (
     <TooltipPrimitive.Arrow
       ref={ref}
-      className={cn('fill-neutral-300 dark:fill-slate-800', className)}
+      className={cn('fill-primary', className)}
       {...props}
     />
   );

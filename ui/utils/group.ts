@@ -1,5 +1,11 @@
 import type { Group, Item } from '~/types';
 
+export function checkGroupExists(groupNames: string[], name: string) {
+  if (groupNames.includes(name)) {
+    return `\`${name}\` already exists`;
+  }
+}
+
 function findGroupAndItem(groups: Group[], groupName: string, ip: string) {
   const group = groups.find((v) => v.name === groupName);
   if (!group) {
@@ -12,7 +18,7 @@ function findGroupAndItem(groups: Group[], groupName: string, ip: string) {
   return { group, item };
 }
 
-export function findAllGroupsAndItems(
+export function findTargetGroupsAndItems(
   groups: Group[],
   groupName: string,
   ip: string,

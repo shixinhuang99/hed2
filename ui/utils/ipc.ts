@@ -1,20 +1,23 @@
 import { invoke } from '@tauri-apps/api/core';
 import type { Group, Item } from '~/types';
 import { storage } from './storage';
+import { SYSTEM_GROUP_NAME } from '~/consts';
 
-type GroupDTO = Pick<Group, 'name' | 'text' | 'list'>;
+type RawGroup = Pick<Group, 'name' | 'text' | 'list'>;
 
 export const ipc = {
   async getGroups(): Promise<Group[]> {
-    const groupsDTO: GroupDTO[] = await invoke('get_groups');
-    const enabledGroups: Group[] = groupsDTO.map((group) => {
-      return {
-        ...group,
-        system: group.name === 'System',
-        enabled: true,
-        textDraft: group.text,
-      };
-    });
+    const enabledGroups: Group[] = await invoke<RawGroup[]>('get_groups').then(
+      (rawGroups) => {
+        return rawGroups.map((group) => {
+          return {
+            ...group,
+            system: group.name === SYSTEM_GROUP_NAME,
+            enabled: true,
+          };
+        });
+      },
+    );
     const disabledGroups = storage.getDisabledGroups();
     return [...enabledGroups, ...disabledGroups];
   },

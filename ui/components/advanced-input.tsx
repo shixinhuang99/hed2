@@ -17,19 +17,31 @@ interface AdvancedInputProps
   onOk: (v: string) => void;
   onValidate?: (v: string) => string | Promise<string | undefined> | undefined;
   onCancel?: () => void;
+  selectAllWhenMounted?: boolean;
 }
 
 export function AdvancedInput(props: AdvancedInputProps) {
-  const { className, initValue, onOk, onValidate, onCancel, ...restProps } =
-    props;
+  const {
+    className,
+    initValue,
+    onOk,
+    onValidate,
+    onCancel,
+    selectAllWhenMounted,
+    ...restProps
+  } = props;
 
   const inputRef = useRef<HTMLInputElement>(null);
   const [value, setValue] = useState(initValue || '');
   const [err, setErr] = useState('');
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     if (inputRef.current) {
       inputRef.current.focus();
+      if (selectAllWhenMounted) {
+        inputRef.current.select();
+      }
     }
   }, []);
 
@@ -38,6 +50,10 @@ export function AdvancedInput(props: AdvancedInputProps) {
       return;
     }
     const finalValue = value.trim();
+    if (!finalValue && onCancel) {
+      onCancel();
+      return;
+    }
     if (onValidate) {
       const ret = onValidate(finalValue);
       if (ret instanceof Promise) {

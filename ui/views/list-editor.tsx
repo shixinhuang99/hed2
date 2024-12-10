@@ -1,4 +1,4 @@
-import { useAtomValue, useSetAtom } from 'jotai';
+import { useAtomValue, useSetAtom, type PrimitiveAtom, useAtom } from 'jotai';
 import {
   Ban,
   Check,
@@ -13,6 +13,8 @@ import {
   deleteItemAtom,
   setEnabledHostsAtom,
   setItemIpAtom,
+  itemAtomsAtom,
+  setSameGroupItemAtom,
 } from '~/atom';
 import { Badge, Button, ScrollArea } from '~/components';
 import { AdvancedInput } from '~/components/advanced-input';
@@ -29,47 +31,61 @@ import {
   DropdownMenuTrigger,
 } from '~/components/dropdown-menu';
 import { ToggleGroup, ToggleGroupItem } from '~/components/toggle-group';
-import type { Host } from '~/types';
+import type { Host, Item } from '~/types';
 import { ipc } from '~/utils/ipc';
+import { NOT_EXISTS_GROUP_NAME } from '~/consts';
 
 export function ListEditor() {
   const currentGroup = useAtomValue(currentGroupAtom);
 
-  if (!currentGroup) {
+  if (currentGroup.name === NOT_EXISTS_GROUP_NAME) {
     return null;
   }
 
   return (
     <ScrollArea className="flex-1 px-3">
-      {currentGroup.list.map((item) => {
-        return (
-          <div
-            className="border border-border/50 dark:border-border rounded-md mt-3 p-4 last:mb-3"
-            key={`${item.group}-${item.ip}`}
-          >
-            <Title
-              ip={item.ip}
-              group={item.group}
-              isCurrentSystemGroup={currentGroup.system}
-            />
-            <Hosts ip={item.ip} hosts={item.hosts} />
-          </div>
-        );
-      })}
+      <List />
     </ScrollArea>
   );
 }
 
-function Title(props: {
-  ip: string;
-  group: string;
-  isCurrentSystemGroup: boolean;
-}) {
-  const { ip, group, isCurrentSystemGroup } = props;
+function List() {
+  const itemAtoms = useAtomValue(itemAtomsAtom);
 
+  return itemAtoms.map((itemAtom) => (
+    <ListItem key={`${itemAtom}`} itemAtom={itemAtom} />
+  ));
+}
+
+function ListItem(props: { itemAtom: PrimitiveAtom<Item> }) {
+  const { itemAtom } = props;
+
+  const [item, setItem] = useAtom(itemAtom);
+  const setSameGroupItem = useSetAtom(setSameGroupItemAtom);
+
+  const handleItemChange = (v: Partial<Item>) => {
+    const newItem = { ...item, ...v };
+    setItem(newItem);
+    setSameGroupItem(item.ip, newItem);
+  };
+
+  return (
+    <div className="border border-border/50 dark:border-border rounded-md mt-3 p-4 last:mb-3">
+      <Title ip={item.ip} group={item.group} onItemChagne={handleItemChange} />
+      <Hosts ip={item.ip} hosts={item.hosts} />
+    </div>
+  );
+}
+
+function Title(
+  props: Pick<Item, 'ip' | 'group'> & {
+    onItemChagne: (v: Partial<Item>) => void;
+  },
+) {
+  const { ip, group, onItemChagne } = props;
+
+  const currentGroup = useAtomValue(currentGroupAtom);
   const [showIpInput, setShowIpInput] = useState(false);
-  const setItemIp = useSetAtom(setItemIpAtom);
-  const deleteItem = useSetAtom(deleteItemAtom);
 
   const handleEditIp = () => {
     setShowIpInput(true);
@@ -80,14 +96,14 @@ function Title(props: {
   };
 
   const handleEditIpOk = (newIp: string) => {
-    if (newIp && newIp !== ip) {
-      setItemIp(ip, newIp);
+    if (newIp !== ip) {
+      onItemChagne({ ip: newIp });
     }
     setShowIpInput(false);
   };
 
   const handleIpValidate = async (newIp: string) => {
-    if (!newIp || newIp === ip) {
+    if (newIp === ip) {
       return;
     }
     const isIp = await ipc.isIp(newIp);
@@ -97,10 +113,10 @@ function Title(props: {
   };
 
   const handleItemDelete = () => {
-    deleteItem(ip);
+    // deleteItem(ip);
   };
 
-  const showBedge = isCurrentSystemGroup && group !== 'System';
+  const showBedge = currentGroup.system && group !== 'System';
 
   return (
     <div className="flex justify-between pb-4 group">
@@ -115,6 +131,7 @@ function Title(props: {
             onOk={handleEditIpOk}
             onCancel={handleEditIpCancel}
             onValidate={handleIpValidate}
+            selectAllWhenMounted
           />
         ) : (
           <span className="select-text cursor-text text-lg font-semibold">

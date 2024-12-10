@@ -13,7 +13,7 @@ export function App() {
   return (
     <div className="h-screen w-screen flex flex-col">
       <ThemeProvider>
-        <TooltipProvider>
+        <TooltipProvider delayDuration={100}>
           <AppHeader />
           <ResizablePanelGroup
             className="select-none"

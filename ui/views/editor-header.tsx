@@ -1,5 +1,5 @@
 import { Tabs, TabsList, TabsTrigger } from '~/components/tabs';
-import { EditorKind } from '~/enum';
+import { EditorKind } from '~/consts';
 
 interface EditorHeaderProps {
   editorKind: string;

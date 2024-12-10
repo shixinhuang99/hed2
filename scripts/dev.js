@@ -28,7 +28,16 @@ function main() {
 
   const checkAndExit = () => {
     if (cmds.every((cmd) => cmd.closed)) {
-      process.exit();
+      process.exit(0);
+    }
+  };
+
+  const killAll = () => {
+    for (const cmd of cmds) {
+      if (cmd.closed) {
+        continue;
+      }
+      kill(cmd.cp.pid);
     }
   };
 
@@ -56,16 +65,15 @@ function main() {
     cp.on('close', () => {
       cmd.closed = true;
       if (cmd.name === 'tauri') {
-        for (const cmd of cmds) {
-          if (cmd.closed) {
-            continue;
-          }
-          kill(cmd.cp.pid);
-        }
+        killAll();
       }
       checkAndExit();
     });
   }
+
+  process.on('SIGINT', () => {
+    killAll();
+  });
 }
 
 main();

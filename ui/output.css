@@ -780,10 +780,6 @@ body {
   height: 100vh;
 }
 
-.h-3 {
-  height: 0.75rem;
-}
-
 .min-h-12 {
   min-height: 3rem;
 }
@@ -1092,6 +1088,10 @@ body {
   fill: #ef4444;
 }
 
+.fill-primary {
+  fill: hsl(var(--primary));
+}
+
 .p-1 {
   padding: 0.25rem;
 }
@@ -1111,6 +1111,11 @@ body {
 .px-0 {
   padding-left: 0px;
   padding-right: 0px;
+}
+
+.px-0\.5 {
+  padding-left: 0.125rem;
+  padding-right: 0.125rem;
 }
 
 .px-1\.5 {
@@ -1163,6 +1168,10 @@ body {
   padding-bottom: 0.5rem;
 }
 
+.pb-1 {
+  padding-bottom: 0.25rem;
+}
+
 .pb-2 {
   padding-bottom: 0.5rem;
 }
@@ -1181,6 +1190,10 @@ body {
 
 .pt-0 {
   padding-top: 0px;
+}
+
+.pt-2\.5 {
+  padding-top: 0.625rem;
 }
 
 .text-left {

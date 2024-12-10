@@ -1,8 +1,9 @@
 import { useAtomValue } from 'jotai';
-import { currentGroupAtom } from '~/atom';
+import { currentGroupAtom, systemHostsTextDraftAtom } from '~/atom';
 
 export function TextEditor() {
   const currentGroup = useAtomValue(currentGroupAtom);
+  const systemHostsTextDraft = useAtomValue(systemHostsTextDraftAtom);
 
   if (!currentGroup) {
     return null;
@@ -10,7 +11,7 @@ export function TextEditor() {
 
   return (
     <div className="whitespace-pre overflow-auto flex-1">
-      {currentGroup.textDraft}
+      {currentGroup.system ? systemHostsTextDraft : currentGroup.text}
     </div>
   );
 }
