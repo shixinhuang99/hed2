@@ -30,7 +30,7 @@ pub fn check_hosts_readonly() -> Result<()> {
 	if permissions.readonly() {
 		anyhow::bail!(
 			"The hosts file is in read-only mode, please disable it manually"
-		)
+		);
 	}
 
 	Ok(())

@@ -1,10 +1,10 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-mod result_ext;
+mod error;
 mod sys;
 
 use anyhow::Result;
-use result_ext::ResultExt;
+use error::ResultExt;
 use tauri::{webview::WebviewWindow, Manager, WindowEvent};
 use tauri_plugin_window_state::{AppHandleExt, StateFlags, WindowExt};
 
@@ -64,15 +64,13 @@ fn run() -> Result<()> {
 
 #[tauri::command]
 fn read_system_hosts() -> Result<String, String> {
-	sys::read_hosts()
-		.map_err(|_| "Failed to read system hosts file".to_string())
+	sys::read_hosts().map_err(|err| err.to_string())
 }
 
 #[tauri::command]
 fn write_system_hosts(content: String) -> Result<(), String> {
 	sys::check_hosts_readonly().map_err(|err| err.to_string())?;
-	sys::write_hosts(content)
-		.map_err(|_| "Failed to write to system hosts file".to_string())
+	sys::write_hosts(content).map_err(|err| err.to_string())
 }
 
 #[tauri::command]

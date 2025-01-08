@@ -51,9 +51,13 @@ function createWindow() {
 function initIpc() {
   ipcMain.handle('read-system-hosts', async () => {
     try {
-      return await readHosts();
-    } catch (_) {
-      throw new Error('Failed to read system hosts file');
+      const content = await readHosts();
+      return { data: content };
+    } catch (error) {
+      if (error instanceof Error) {
+        return { error: error.message };
+      }
+      throw error;
     }
   });
 
@@ -65,8 +69,11 @@ function initIpc() {
         );
       }
       await writeHosts(content);
-    } catch (_) {
-      throw new Error('Failed to write system hosts file');
+    } catch (error) {
+      if (error instanceof Error) {
+        return { error: error.message };
+      }
+      throw error;
     }
   });
 

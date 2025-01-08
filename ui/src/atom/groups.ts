@@ -89,24 +89,26 @@ export const groupAtomsAtom = splitAtom(
 );
 
 export const initGroupsAtom = atom(null, async (get, set) => {
-  try {
-    let systemHosts = await ipc.readSystemHosts();
-    if (systemHosts.includes('\r\n')) {
-      systemHosts = systemHosts.replaceAll('\r\n', '\n');
-    }
-    const rawGroups = parser.textToGroups(systemHosts);
-    const disabledGroups = storage.getDisabledGroups();
-    const groups = mergeGroups(rawGroups, disabledGroups);
-    if (groups.length) {
-      set(currentGroupNameAtom, groups[0].name);
-    }
-    set(groupsAtom, groups);
-    set(systemHostsAtom, systemHosts);
-    if (!get(hostsHistoryAtom).length) {
-      set(addHostsHistoryAtom, systemHosts);
-    }
-  } catch (error) {
-    toastError(error);
+  let systemHosts = await ipc.readSystemHosts().catch((error) => {
+    toastError('Failed to read system hosts file', error);
+    return null;
+  });
+  if (!systemHosts) {
+    return;
+  }
+  if (systemHosts.includes('\r\n')) {
+    systemHosts = systemHosts.replaceAll('\r\n', '\n');
+  }
+  const rawGroups = parser.textToGroups(systemHosts);
+  const disabledGroups = storage.getDisabledGroups();
+  const groups = mergeGroups(rawGroups, disabledGroups);
+  if (groups.length) {
+    set(currentGroupNameAtom, groups[0].name);
+  }
+  set(groupsAtom, groups);
+  set(systemHostsAtom, systemHosts);
+  if (!get(hostsHistoryAtom).length) {
+    set(addHostsHistoryAtom, systemHosts);
   }
 });
 
@@ -141,9 +143,10 @@ export const saveSystemHostsAtom = atom(null, async (get, set) => {
   }
   try {
     await ipc.writeSystemHosts(systemGroup.text);
-    set(addHostsHistoryAtom, systemGroup.text);
   } catch (error) {
-    toastError(error);
+    toastError('Failed to write system hosts file', error);
+    return;
   }
+  set(addHostsHistoryAtom, systemGroup.text);
   set(initGroupsAtom);
 });

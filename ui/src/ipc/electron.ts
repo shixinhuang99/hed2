@@ -1,12 +1,19 @@
 import { Ipc } from './abstract';
 
 export class ElectronIpc extends Ipc {
-  readSystemHosts(): Promise<string> {
-    return window.electronAPI.readSystemHosts();
+  async readSystemHosts(): Promise<string> {
+    const result = await window.electronAPI.readSystemHosts();
+    if (result.error) {
+      throw new Error(result.error);
+    }
+    return result.data;
   }
 
-  writeSystemHosts(content: string): Promise<void> {
-    return window.electronAPI.writeSystemHosts(content);
+  async writeSystemHosts(content: string): Promise<void> {
+    const result = await window.electronAPI.writeSystemHosts(content);
+    if (result.error) {
+      throw new Error(result.error);
+    }
   }
 
   async viewGitHub(): Promise<void> {
