@@ -1,6 +1,4 @@
-# Hed2
-
-## A hosts file editor desktop client
+# Hed2 - hosts file editor desktop client
 
 ### Key features
 
