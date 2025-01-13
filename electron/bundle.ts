@@ -19,7 +19,7 @@ async function main() {
       target: [{ target: 'nsis', arch: ['x64'] }],
     },
     mac: {
-      target: [{ target: 'dmg', arch: ['universal'] }],
+      target: [{ target: 'dmg', arch: ['arm64', 'x64'] }],
       category: 'public.app-category.developer-tools',
     },
     nsis: {
