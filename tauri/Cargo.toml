@@ -1,6 +1,6 @@
 [package]
 name = "hed2-tauri"
-version = "1.0.0"
+version = "1.0.1"
 description = "A hosts file editor desktop client"
 authors = ["shixinhuang99 <shixinhuang99@gmail.com>"]
 repository = "https://github.com/shixinhuang99/hed2"
